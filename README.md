@@ -15,6 +15,6 @@
 
 <img width="1452" alt="스크린샷 2025-05-07 오후 10 09 02" src="https://github.com/user-attachments/assets/242aac58-8bf0-42d5-a43f-27f48984633f" />
 
-<img width="1453" alt="스크린샷 2025-05-07 오후 10 09 15" src="https://github.com/user-attachments/assets/ba1faccc-eda2-4f91-b7b8-23caed590ca5" />
+<img width="1402" alt="스크린샷 2025-05-07 오후 10 20 00" src="https://github.com/user-attachments/assets/e69aa8f6-ae9b-484f-b2dd-55be3a97599b" />
 
 <img width="1454" alt="스크린샷 2025-05-07 오후 10 09 27" src="https://github.com/user-attachments/assets/7f8ef514-3af4-4c13-a23a-1c277edbbf53" />
