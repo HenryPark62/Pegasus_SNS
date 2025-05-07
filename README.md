@@ -7,4 +7,5 @@ Pegasus는 Java 기반의 SNS입니다.
 - App 디자인은 생성형 AI (ChatGPT) 사용
 
 
-<img src="https://github.com/user-attachments/assets/a00ed20a-7104-482e-abca-a1d3ae122fb0.png" width="400" height="400"\>
+
+<img src=https://github.com/user-attachments/assets/7287fae7-c430-45f1-98b6-20ac5e8b7161 width="400" height="400">
