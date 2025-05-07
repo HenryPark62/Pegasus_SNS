@@ -1,4 +1,4 @@
-# Pegasus_SNS (1인 프로젝트)
+# Pegasus_SNS
 
 <img src=https://github.com/user-attachments/assets/7287fae7-c430-45f1-98b6-20ac5e8b7161 width="400" height="400">
 
@@ -9,3 +9,7 @@
 - 개발한 SNS Web 기반 서비스를 모바일(Android)환경에서 동작하는 Web View App 으로 개발
 - App 디자인은 생성형 AI (ChatGPT) 사용
 
+- 개발 인원: 1인
+- 개발 기간: 24.11.01 ~ 24.12.01
+
+[프레젠테이션1.pdf](https://github.com/user-attachments/files/20084700/1.pdf)
