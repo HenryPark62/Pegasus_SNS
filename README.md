@@ -12,4 +12,7 @@
 - 개발 인원: 1인
 - 개발 기간: 24.11.01 ~ 24.12.01
 
-[프레젠테이션1.pdf](https://github.com/user-attachments/files/20084700/1.pdf)
+
+<img width="1452" alt="스크린샷 2025-05-07 오후 10 09 02" src="https://github.com/user-attachments/assets/242aac58-8bf0-42d5-a43f-27f48984633f" />
+<img width="1453" alt="스크린샷 2025-05-07 오후 10 09 15" src="https://github.com/user-attachments/assets/ba1faccc-eda2-4f91-b7b8-23caed590ca5" />
+<img width="1454" alt="스크린샷 2025-05-07 오후 10 09 27" src="https://github.com/user-attachments/assets/7f8ef514-3af4-4c13-a23a-1c277edbbf53" />
