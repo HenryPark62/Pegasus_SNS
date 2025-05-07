@@ -1,0 +1,180 @@
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=0">
+<meta charset="utf-8" />
+<link rel="stylesheet" href="css/core.css">
+<link rel="stylesheet" href="css/main.css">
+<title>게시글 수정 • Pegasus</title>
+<style>
+.pad-4 { padding: 0 4px; }
+textarea {
+    float: left;
+    width: 100%;
+    height: 160px;
+    padding: 16px; 
+    box-sizing: border-box;
+    font-size: 1.0em;
+    font-family: 'Malgun Gothic', 'Arial';
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    outline: none;
+}
+
+input[type=file] {
+    padding: 0px;
+    border: none;
+    outline: none;
+    font-size: 0.95em;
+}
+
+.desc {
+    float: left;
+    width: 100%;
+    margin-bottom: 5px;
+    font-size: 0.9em;
+    color: #888;
+}
+</style>
+</head>
+<body>
+    <div class="page-hdr">Pegasus</div>
+    <div class="page-body">
+
+        <div class="section pad-24 mtop-30">
+            <input id="id" type="text" class="mbot-10" placeholder="아이디" readonly>
+            <textarea id="content" class="mtop-10" placeholder="내용을 수정하세요..."></textarea>
+            <div class="section pad-4 mtop-30">
+                <div class="desc">다른 이미지를 선택하려면 아래에서 선택하세요. 기존의 이미지는 유지됩니다. (heic 계열 파일은 지원하지 않습니다.)</div>
+                <input type="file" id="image">
+            </div>
+            <input type="submit" class="mtop-30" value="수정하기" onclick="updatePost(); return false;">
+            <div class="desc mtop-20 mbot-20">
+                <a href="Main.html"><button class="button">메인화면으로 돌아가기</button></a>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
+
+<script src="js/jquery-3.7.1.min.js"></script>
+<script src="js/core.js"></script>
+<script>
+$(document).ready(function() {
+    // 페이지 초기화 시작
+    Page.init(start);
+});
+
+function start(uid) {
+    // URL에서 postId, postNo 추출
+    var postId = getUrlParameter("id");  // 작성자 ID
+    var postNo = getUrlParameter("no");  // 게시글 번호
+    console.log("start() - 호출: uid = " + uid + ", postId = " + postId + ", postNo = " + postNo);  // 디버깅 로그
+    
+    if (!postId || !postNo) {
+        alert("게시글 ID나 번호가 제공되지 않았습니다.");
+        return;
+    }
+
+    // 만약 uid가 null이면, 로컬 스토리지에서 가져오기 (로그인된 사용자 세션 확인)
+    if (!uid) {
+        uid = localStorage.getItem("currentUserId"); // localStorage에서 현재 사용자 ID를 가져오기
+        if (!uid) {
+            alert("로그인 정보가 없습니다. 로그인 페이지로 이동합니다.");
+            window.location.href = "Login.html";  // 로그인 페이지로 리디렉션
+            return;
+        }
+    }
+
+    // 게시글 수정 시, 서버에서 게시글 데이터를 불러와서 표시
+    var params = { id: uid, no: postNo };
+    console.log("AJAX 요청 파라미터:", params);  // 디버깅 로그
+    AJAX.call("jsp/feedGetByNo.jsp", params, function(data) {
+        console.log("서버 응답 데이터:", data);  // 디버깅 로그
+        var postObj = JSON.parse(data.trim());
+        setPage(postObj, uid);
+    });
+}
+
+
+
+
+
+function getUrlParameter(name) {
+    var urlParams = new URLSearchParams(window.location.search);
+    return urlParams.get(name);
+}
+
+function setPage(postObj, uid) {
+    console.log("setPage() - 호출, postObj:", postObj);  // 디버깅 로그
+    if (postObj == null) return;
+    
+    // 작성자 ID가 로그인된 ID와 일치하는지 확인
+    if (postObj.id !== uid) {
+        alert("권한이 없습니다. 이 게시글은 수정할 수 없습니다.");
+        window.location.href = "Main.html"; // 권한 없으면 메인 화면으로 리디렉션
+        return;
+    }
+    
+    $("#id").val(postObj.id);  // 작성자 ID
+    $("#content").val(postObj.content);  // 기존 내용
+}
+
+
+
+
+
+function updatePost() {
+    var id = $("#id").val().trim();
+    var content = $("#content").val().trim();
+    var postNo = getUrlParameter("no");  // Ensure postNo is retrieved from URL
+
+    if (content == "") {
+        alert("수정할 내용을 입력해 주세요.");
+        $("#content").focus();
+        return;
+    }
+
+    var imgobj = $("#image")[0].files[0];
+    var jsonobj = { id: id, content: content, ts: getTime(), no: postNo };  // Ensure no is included
+
+    if (imgobj != null) {
+        jsonobj.images = [imgobj.name];
+    }
+
+    var params = new FormData();
+    params.append("jsonstr", JSON.stringify(jsonobj));
+    params.append("id", id);  // Add id explicitly
+    params.append("no", postNo);  // Add postNo explicitly
+    
+    console.log(params);
+
+    if (imgobj != null) {
+        params.append("image", imgobj);
+    }
+
+    var url = "jsp/feedEdit.jsp";
+    AJAX.call(url, params, function(data) {
+        console.log("서버 응답 데이터 (게시글 수정):", data);  // 디버깅 로그
+        var code = data.trim();
+        if (code == "ER") {		
+            alert("게시글 수정 중 오류가 발생했습니다.");
+        } else {
+            alert("게시글이 수정되었습니다.");
+            window.location.href = "Main.html";
+        }
+    }, true);
+}
+
+
+function getTime() {
+    var date = new Date();
+    var year = date.getFullYear();
+    var month = ("0" + (1 + date.getMonth())).slice(-2);
+    var day =  ("0" + date.getDate()).slice(-2);
+    var hour =  ("0" + date.getHours()).slice(-2);
+    var min =  ("0" + date.getMinutes()).slice(-2);
+    var sec =  ("0" + date.getSeconds()).slice(-2);
+    
+    return year + "-" + month + "-" + day + "-" + hour + ":" + min + ":" + sec;
+}
+</script>

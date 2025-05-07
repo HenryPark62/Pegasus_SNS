@@ -1,0 +1,126 @@
+<html>
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=0">
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="css/core.css">
+    <link rel="stylesheet" href="css/main.css">
+    <title>Pegasus</title>
+</head>
+<body>
+    <div class="page-hdr">Pegasus</div>
+    <div class="page-body">
+        <div id="list" class="section"></div>
+        <div class="page-mnu">
+            <div class="menu" onclick="addFeed()">글쓰기</div>
+            <div class="menu" onclick="showFriends()">친구</div>
+            <div class="menu" onclick="showUserInfo()">프로필</div>
+            <!--  <div class="menu" onclick="showUserList()">유저리스트</div>-->
+            <div class="menu" onclick="refresh()">새로고침</div>
+        </div>
+    </div>
+</body>
+</html>
+
+<script src="js/jquery-3.7.1.min.js"></script>
+<script src="js/core.js"></script>
+<script>
+$(document).ready(function() {
+    Page.init(start);
+    setTimeout(updateFeeds, 3000);  // 3초마다 최신 피드 확인
+});
+
+var minNo = -1;
+var feedList = [];
+var frIds = null;
+
+function start(uid) {
+    frIds = '"' + uid + '"';
+    AJAX.call("jsp/friendList.jsp", {id: uid}, function(data) {
+        var list = JSON.parse(data.trim());
+        for (var i = 0; i < list.length; i++) {
+            var friend = JSON.parse(list[i]);
+            if (friend.id) {
+                frIds += ', "' + friend.id + '"';
+            }
+        }
+        start2(uid);
+    });
+}
+
+function start2(uid) {
+    updateFeeds(); // 최초 실행 시 피드를 불러옴
+}
+
+function show(feeds) {
+    var str = "";
+    for (var i = 0; i < feeds.length; i++) {
+        str += getFeedCode(feeds[i]);
+    }
+    $("#list").html(str);  // #list 내용을 새로 받은 피드로 갱신
+}
+
+function getFeedCode(feed) {
+    var name = (feed.user == null) ? feed.id : feed.user.name;
+    var userId = (feed.user == null) ? feed.id : feed.user.id;
+    var str = "<div class='feed' onclick='showFeed(" + JSON.stringify(feed) + ")'>";
+    str += "<div class='author'>";
+
+    if (!feed.user.images || feed.user.images.length === 0) {
+        str += "<div class='photo' style='background-image: url(\"/MySNS2/images/profile/default.jpg\")'></div>";
+    } else {
+        var imgurl = "/MySNS2/images/profile/" + feed.user.images[0];
+        str += "<div class='photo' style='background-image: url(\"" + imgurl + "\")'></div>";
+    }
+
+    str += "<div class='name'>" + name + "</div>";
+    str += "<div class='timestamp'>" + feed.ts + "</div>";
+    str += "</div>";
+
+    if (feed.images != null && feed.images.length > 0) {
+        var imgurl = "/MySNS2/images/feed/" + feed.images[0];
+        str += "<div class='image' style='background-image: url(\"" + imgurl + "\")'></div>";
+    }
+
+    str += "<div class='content pad-10'>" + feed.content + "</div>";
+    str += "</div>";
+    return str;
+}
+
+function showFeed(feed) {
+    var fid = feed.id;
+    var fno = feed.no;
+    window.location.href = "FeedView.html?id=" + fid + "&no=" + fno;
+}
+
+function updateFeeds() {
+    AJAX.call("jsp/feedGetGroup.jsp", {frids: frIds}, function(data) {
+        var feeds = JSON.parse(data.trim());
+        if (feeds.length > 0) {
+            feedList = feeds;
+            DataCache.set("mainCache", feedList);
+            show(feeds);  // #list 내용을 새로운 피드로 교체하여 갱신
+            minNo = feeds[feeds.length - 1].no;  // minNo 업데이트
+        }
+    });
+}
+
+function addFeed() {
+    window.location.href = "FeedAdd.html";
+}
+
+function showUserInfo() {
+    window.location.href = "UserInfo.html";
+}
+
+function showFriends() {
+    window.location.href = "Friend.html";
+}
+
+function showUserList() {
+    window.location.href = "UserList.html";
+}
+
+function refresh() {
+    window.location.href = "Main.html";
+}
+</script>

@@ -1,0 +1,149 @@
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=0">
+<meta charset="utf-8" />
+<link rel="stylesheet" href="css/core.css">
+<link rel="stylesheet" href="css/main.css">
+<title>게시글 작성 • Pegasus</title>
+<style>
+.pad-4 { padding: 0 4px; }
+textarea {
+	float: left;
+	width: 100%;
+	height: 160px;
+	padding: 16px; 
+	box-sizing: border-box;
+	font-size: 1.0em;
+	font-family: 'Malgun Gothic', 'Arial';
+	border: 1px solid #ddd;
+	border-radius: 4px;
+	outline: none;
+}
+
+input[type=file] {
+	padding: 0px;
+	border: none;
+	outline: none;
+	font-size: 0.95em;
+}
+
+.desc {
+	float: left;
+	width: 100%;
+	margin-bottom: 5px;
+	font-size: 0.9em;
+	color: #888;
+}
+</style>
+</head>
+<body>
+	<div class="page-hdr">Pegasus</div>
+	<div class="page-body">
+
+		<div class="section pad-24 mtop-30">
+			<input id="id" type="text" class="mbot-10" placeholder="아이디" readonly>
+			<textarea id="content" class="mtop-10" placeholder="당신의 이야기를 적어주세요..."></textarea>
+			<div class="section pad-4 mtop-30">
+				<div class="desc">아래에서 이미지를 선택해주세요. (heic 계열 파일은 지원하지 않습니다.)</div>
+				<input type="file" id="image">
+			</div>
+			<input type="submit" class="mtop-30 button" value="업로드하기" onclick="upload(); return false;">
+			<div class="desc mtop-20 mbot-20">
+		<a href="Main.html"><button class="button">메인화면으로 돌아가기</button></a>
+	</div>
+	
+	<!-- 이미지를 업로드한 후, 이미지 URL을 사용하여 페이지에서 표시 -->
+<img id="uploadedImage" src="" alt="업로드된 이미지" style="display:none;">
+
+
+	</div>
+	</div>
+</body>
+</html>
+
+<script src="js/jquery-3.7.1.min.js"></script>
+<script src="js/core.js"></script>
+<script>
+$(document).ready(function() {
+	Page.init(start);
+});
+
+function start(uid) {
+	console.log("UID: " + uid);  // uid 값이 제대로 전달되는지 확인
+	//Page setup codes will be placed here...
+	//입력 태그에 초기값 설정이 필요한 경우, 즉 UI 초기값 설정이 필요한 경우 start()에서 해당 코드 구현 가능.
+	
+	var params = {id: uid};
+	AJAX.call("jsp/userGet.jsp", params, function(data) {
+		userObj = JSON.parse(data.trim());
+		setPage(userObj);
+	});
+	
+}
+
+function setPage(uobj) {
+	if (uobj == null) return;
+	  console.log("Setting ID: " + uobj.id);  // uobj.id 값이 제대로 설정되는지 확인
+	$("#id").val(uobj.id);
+	$("#name").val(uobj.name);
+	$("#desc").val(uobj.desc);
+}
+
+
+function upload() {
+	var id = $("#id").val().trim();
+	console.log("ID: " + id);
+	//if (id == "") {
+	//	alert("아이디를 입력해 주세요.");
+	//	$("#id").focus();
+	//return;
+	//}
+	
+	var content = $("#content").val().trim();
+	if (content == "") {
+		alert("작성글을 입력해 주세요.");
+		$("#content").focus();
+		return;
+	}
+	
+	var imgobj = $("#image")[0].files[0];
+	
+	var jsonobj = {id: id, content: content, ts: getTime()};
+	console.log("ID: " + id);
+	if (imgobj != null) {
+		jsonobj.images = [imgobj.name];
+	}
+	
+	var params = new FormData();
+	params.append("jsonstr", JSON.stringify(jsonobj));
+	//params.append("id", id);
+	//params.append("content", content);
+	if (imgobj != null) {
+		params.append("image", imgobj);
+	}
+	
+	var url = "jsp/feedAdd.jsp";
+	AJAX.call(url, params, function(data) {
+		var code = data.trim();
+		if(code == "ER") {		
+			alert("작성 글의 업로드 중 오류가 발생했습니다.");
+		}
+		else {
+			alert("작성 글의 업로드가 완료되었습니다.");
+			window.location.href = "Main.html";
+		}
+	}, true);
+}
+
+function getTime() {
+	var date = new Date();
+	var year = date.getFullYear();
+	var month = ("0" + (1 + date.getMonth())).slice(-2);
+	var day =  ("0" + date.getDate()).slice(-2);
+	var hour =  ("0" + date.getHours()).slice(-2);
+	var min =  ("0" + date.getMinutes()).slice(-2);
+	var sec =  ("0" + date.getSeconds()).slice(-2);
+	
+	return year + "-" + month + "-" + day + "-" + hour + ":" + min + ":" + sec;
+}
+</script> 

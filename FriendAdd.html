@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=0">
+<meta charset="utf-8" />
+<link rel="stylesheet" href="css/core.css">
+<link rel="stylesheet" href="css/main.css">
+<title>친구 추가 • Pegasus</title>
+<style>
+.feed {
+    border-top: 1px solid #eee;
+    display: flex; /* 플렉스 박스를 사용하여 정렬 */
+    align-items: center; /* 세로 중앙 정렬 */
+    padding: 10px 0; /* 여백 추가 */
+}
+.feed .author {
+    flex-grow: 1; /* 남은 공간을 차지하게 함 */
+    position: relative;
+}
+
+</style>
+</head>
+<body>
+    <div class="page-hdr">Pegasus</div>
+    <div class="page-body">
+        <div class="page-mnu">
+            <div class="menu" onclick="goHome()">메인</div>
+            <div class="menu" onclick="goAdd()">친구추천</div>
+            <div class="menu" onclick="goList()">내친구</div>
+        </div>
+        <div id="list" class="section"></div>
+        <div class="page-msg">추천할 친구가 없습니다.</div> 
+    </div>
+
+<script src="js/jquery-3.7.1.min.js"></script>
+<script src="js/core.js"></script>
+<script>
+  $(document).ready(function() {
+      Page.init(start);
+});
+
+var myId = null;
+function start(uid) {
+    myId = uid;
+    
+    AJAX.call("jsp/userList.jsp", null, function(data) {
+        try {
+            var list = JSON.parse(data.trim());
+            show(list);
+        } catch (e) {
+            console.error("Failed to parse JSON: ", e);
+        }
+    });
+}
+    
+    
+    /* AJAX.call("jsp/userList.jsp", null, function(data) {
+        var list = JSON.parse(data.trim());
+        System.out.println("list: uid=" + list); // 로그 추가
+       	console.log(list);
+        show(list);
+    });
+} */
+
+function show(list) {
+    var str = "", cnt = 0;
+    for (var i=0; i<list.length; i++) {
+        if (list[i].id == myId) continue; 
+        
+        str += getFeedCode(list[i]);
+        cnt++;
+    }
+    $("#list").append(str);
+    
+    if (cnt === 0) {
+        $(".page-msg").show(); // 메시지 표시
+    } else {
+        $(".page-msg").hide(); // 친구가 있을 경우 메시지 숨김
+    }
+}
+
+function getFeedCode(user) {
+    var str = "<div class='feed'>";
+
+    str += "<div class='author'>";
+
+    // user.images가 null이거나 빈 배열일 경우를 처리
+    if (!user.images || user.images.length === 0) {
+        str += "<div class='photo'></div>"; // 기본 사진 공간
+    } else {
+    	 var imgurl = "/MySNS2/images/profile/" + user.images[0];
+        str += "<div class='photo' style='background-image: url(\"" + imgurl + "\")'></div>"; // 첫 번째 이미지 사용
+    }
+
+    // 이름과 추가 버튼을 같은 줄에 배치
+    str += "<div class='name'>" + user.name + "</div>";
+    str += "<div class='btn-add' onclick='addFriend(\"" + user.id + "\")'></div>"; // 친구 추가 버튼 내용 추가
+    str += "</div>"; // .author div 닫기
+    str += "</div>"; // .feed div 닫기
+
+    return str;
+}
+
+function addFriend(uid) {
+    var params = {id: myId, frid: uid};
+    AJAX.call("jsp/friendAdd.jsp", params, function(data) {
+        var code = data.trim();
+        if (code == "EX") {
+            alert("이미 추가된 친구입니다.");
+        } else {
+            alert("친구 추가가 완료되었습니다.");
+        }
+    });
+}
+
+function goHome() {
+    window.location.href = "Main.html";
+}
+
+function goAdd() {
+    window.location.href = "FriendAdd.html";
+}
+
+function goList() {
+    window.location.href = "Friend.html";
+}
+</script>
+</body>
+</html>

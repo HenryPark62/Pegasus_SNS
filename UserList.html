@@ -1,0 +1,50 @@
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=0">
+<meta charset="utf-8" />
+<link rel="stylesheet" href="css/core.css">
+<title>회원 리스트 • Pegasus</title>
+</head>
+<body>
+	<div class="page-hdr">Pegasus</div>
+	<div class="page-body">
+		<div id="list" class="section mtop-10 mbot-30 pad-16">
+			<!-- 사용자 목록이 표시되는 곳 -->
+		</div>
+		<div class="button" onclick="goMain()">메인화면으로 돌아가기</div>
+	</div>
+</body>
+</html>
+
+<script src="js/jquery-3.7.1.min.js"></script>
+<script src="js/core.js"></script>
+<script>
+$(document).ready(function() {
+	Page.init(start);
+});
+
+function start(uid) {
+	AJAX.call("jsp/userList.jsp", null, function(data) {
+		var users = JSON.parse(data.trim());
+		show(users);
+	});
+}
+
+function show(users) {
+	var str = "";
+	str += "<tr><td colspan=3>회원 리스트</td></tr>";
+	for (var i=0; i<users.length; i++) {
+		str += "<tr><td colspan=3><hr></td></tr>";
+		str += "<tr>";
+		str += "<td>&nbsp;&nbsp;" + users[i].id + "</td>";
+		str += "<td>&nbsp;&nbsp;" + users[i].name + "</td>";
+		str += "<td><small>&nbsp;(" + users[i].ts + ")</small></td>";
+		str += "</tr>";
+	}
+	$("#list").html(str);
+}
+
+function goMain() {
+	window.location.href = "Main.html";
+}
+</script>

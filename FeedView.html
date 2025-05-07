@@ -1,0 +1,185 @@
+<html>
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=0">
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="css/core.css">
+    <link rel="stylesheet" href="css/main.css">
+    <title>게시글 • Pegasus</title>
+    <style>
+        /* 원본 이미지 크기를 유지하는 CSS */
+        .full-image {
+            width: 100% !important;
+            height: auto !important;
+            object-fit: contain !important;
+            margin: 0px !important;  /* 이미지와 텍스트 사이에 여백 추가 */
+        }
+
+        .content {
+            padding: 10px;
+            font-size: 1.2em;
+            line-height: 1.6;
+        }
+
+        .author {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .photo {
+            width: 40px;
+            height: 40px;
+            background-size: cover;
+            background-position: center;
+            border-radius: 50%;
+            margin-right: 10px;
+        }
+
+        .name {
+            font-weight: bold;
+            font-size: 1.1em;
+        }
+
+        .timestamp {
+            color: #888;
+            font-size: 0.9em;
+        }
+
+        .image {
+            text-align: center !important;
+            margin: 0 !important;
+            padding: 0 !important;
+            padding-bottom: 10px !important;
+        }
+
+    </style>
+</head>
+<body>
+    <div class="page-hdr">Pegasus</div>
+    <div class="page-body">
+        <div id="content" class="section"></div>
+        <div class="page-mnu">
+            
+            <div class="menu" onclick="editFeed()">게시글수정</div>
+            <div class="menu" onclick="deleteFeed()">게시글삭제</div>
+            <div class="menu" onclick="goHome()">홈</div>
+        </div>
+    </div>
+</body>
+</html>
+
+<script src="js/jquery-3.7.1.min.js"></script>
+<script src="js/core.js"></script>
+<script>
+
+let currentPostNo = null;  // 게시글 번호
+let currentUserId = null;  // 작성자 ID
+
+$(document).ready(function() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const postId = urlParams.get('id');  // 작성자 ID
+    const postNo = urlParams.get('no');  // 게시글 번호
+    
+    if (postId && postNo) {
+        currentUserId = postId; 	// 작성자 ID
+        currentPostNo = postNo;  	// 게시글 번호
+        loadFeed(postId, postNo);  	// 게시글을 불러옵니다.
+    } else {
+        alert("게시글을 찾을 수 없습니다.");
+        goHome();
+    }
+});
+
+function loadFeed(id, no) {
+    $.ajax({
+        type: "GET",
+        url: "jsp/feedGetGroup.jsp",  // 게시글을 가져오는 서버 URL
+        data: { id: id, no: no, t: Date.now() },
+        success: function(response) {
+            const feedArray = JSON.parse(response.trim());  // JSON 형식으로 응답을 파싱
+            const feed = feedArray.length > 0 ? feedArray[0] : null;  // 첫 번째 게시글을 가져옵니다.
+
+            if (feed && feed.no === parseInt(no)) {
+                $("#content").append(getFeedCode(feed));  // 게시글을 화면에 출력
+            } else {
+                alert("게시글을 찾을 수 없습니다.");
+                goHome();
+            }
+        },
+        error: function() {
+            alert("게시글을 불러오는 중 오류가 발생했습니다.");
+            goHome();
+        }
+    });
+}
+
+function getFeedCode(feed) {
+    let str = "<div class='feed'>";
+    const name = feed.user ? feed.user.name : feed.id;
+    const imgurl = feed.user?.images?.length > 0 
+        ? "/MySNS2/images/profile/" + feed.user.images[0] 
+        : "/MySNS2/images/profile/default.jpg";
+
+    // 작성자 정보
+    str +=  `<div class='author'>
+            <div class='photo' style='background-image: url("${imgurl}")'></div>
+            <div class='name'>${name}</div>
+            <div class='timestamp'>${feed.ts}</div>
+        </div>`;
+    
+    // 이미지가 있을 경우, 이미지 출력
+    if (feed.images && feed.images.length > 0) {
+        const feedImgUrl = "/MySNS2/images/feed/" + feed.images[0];
+        str += `<div class='image'>
+                    <img src="${feedImgUrl}" alt="Feed Image" class="full-image">
+                </div>`;
+    }
+
+    // 게시글 내용 추가 (변환된 HTML 문자열 사용)
+    str += "<div class='content'>" + feed.content + "</div>";
+
+    return str;
+}
+
+function deleteFeed() {
+    if (confirm("게시글을 정말 삭제하시겠습니까?")) {
+        $.ajax({
+            type: "POST",
+            url: "jsp/feedDelete.jsp",
+            data: {
+                fid: currentUserId,  // 작성자 ID
+                no: currentPostNo    // 게시글 번호
+            },
+            success: function(response) {
+                if (response.trim() === "OK") {
+                    alert("게시글이 삭제되었습니다.");
+                    goHome();  // 삭제 후 메인 페이지로 이동
+                } else {
+                    alert("게시글 삭제에 실패하였습니다.");
+                }
+            },
+            error: function() {
+                alert("서버와의 통신 중 오류가 발생했습니다.");
+            }
+        });
+    }
+}
+
+function goHome() {
+    window.location.href = "Main.html";
+}
+
+function editFeed() {
+    // 현재 URL에서 id와 no를 파싱
+    const urlParams = new URLSearchParams(window.location.search);
+    const fid = urlParams.get("id");
+    const fno = urlParams.get("no");
+
+    // 파싱된 id와 no를 사용하여 FeedEdit.html의 동적 링크 생성
+    if (fid && fno) {
+        window.location.href = "FeedEdit.html?id=" + fid + "&no=" + fno;
+    } else {
+        console.error("id 또는 no를 찾을 수 없습니다.");
+    }
+}
+</script>

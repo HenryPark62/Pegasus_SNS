@@ -1,0 +1,152 @@
+/* 전체 페이지 레이아웃 */
+.page-body {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    padding-bottom: 50px;
+}
+
+/* 메뉴 레이아웃 */
+.page-mnu {
+    z-index: 10;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    padding: 12px 0;
+    box-sizing: border-box;
+    background-color: #f9f9f9;
+    border-top: 1px solid #eee;
+    display: flex;
+}
+
+.page-mnu .menu {
+    z-index: 15;
+    flex: 1;
+    font-size: 0.95em;
+    text-align: center;
+    border-right: 1px solid #eee;
+    padding: 10px 0;
+}
+
+.page-mnu .menu:last-child {
+    border-right: none;
+}
+
+/* 게시글 리스트 스타일 */
+.section {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 10px;
+    box-sizing: border-box;
+}
+
+/* 개별 게시글 스타일 */
+.feed {
+    width: 100%;
+    max-width: 600px;
+    background-color: #fff;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 10px;
+    margin: 10px 0;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    box-sizing: border-box;
+    transition: transform 0.2s;
+    cursor: pointer;
+}
+
+.feed:hover {
+    transform: scale(1.02);
+}
+
+/* 작성자 정보 섹션 */
+.feed .author {
+    display: flex;
+    align-items: center;
+    padding: 5px 0;
+}
+
+.feed .author .photo {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background-size: cover;
+    background-position: center;
+    border: 1px solid #ddd;
+    margin-right: 10px;
+}
+
+.feed .author .name {
+    font-weight: bold;
+    font-size: 1em;
+}
+
+
+.feed .timestamp {
+    font-size: 0.8em;
+    color: #888;
+    margin-top: 3px;
+    padding-left: 20px;
+}
+
+/* 게시글 이미지 */
+.feed .image {
+    width: 100%;
+    padding-top: 56.25%; /* 16:9 비율 */
+    background-size: cover;
+    background-position: center;
+    margin-top: 10px;
+    margin-bottom: 10px; /* 사진과 게시글 내용 사이 여백 추가  */
+    border-radius: 5px;
+}
+
+.feed .image .detail {
+    width: 100%;
+    padding-top: 56.25%; /* 16:9 비율 */
+    background-size: cover;
+    background-position: center;
+    margin-top: 10px;
+    margin-bottom: 10px; /* 사진과 게시글 내용 사이 여백 추가  */
+    border-radius: 5px;
+}
+
+/* 게시글 텍스트 */
+.feed .text2 {
+    margin-top: 10px;
+    font-size: 1em;
+    color: #333;
+}
+
+/* 작성 시간 */
+.feed .timestamp2 {
+    font-size: 0.8em;
+    color: #888;
+    text-align: right;
+    margin-top: 10px;
+}
+
+/* 버튼 스타일 */
+.btn-add,
+.btn-del {
+    position: absolute;
+    right: 16px;
+    top: 10px;
+    width: 24px;
+    height: 24px;
+    background-size: contain;
+    background-position: center;
+    background-repeat: no-repeat;
+}
+
+.btn-add {
+    background-image: url("../images/button/add.jpg");
+}
+
+.btn-del {
+    background-image: url("../images/button/delete.jpg");
+}

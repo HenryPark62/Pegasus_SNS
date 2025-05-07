@@ -1,0 +1,84 @@
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=0">
+<meta charset="utf-8" />
+<link rel="stylesheet" href="css/core.css">
+<title>회원탈퇴 • Pegasus</title>
+<style>
+.desc {
+    float: left;
+    width: 100%;
+    color: #888;
+    font-size: 0.9em;
+}
+</style>
+</head>
+<body>
+<form method="post" action="jsp/withdraw.jsp" onsubmit="return false;">
+    <div class="page-hdr">Pegasus</div>
+    <div class="page-body">
+        <div class="section pad-24 mtop-30">
+            <input name="id" id="id" type="text" placeholder="아이디 (이메일주소)" required readonly>
+            <input name="ps" id="ps" type="password" class="mtop-10" placeholder="패스워드" required>
+            <input type="submit" class="mtop-20" value="회원탈퇴하기" onclick="withdraw()">
+        </div>
+        <div class="section pad-24 mtop-30">
+            <div class="desc mtop-20 mbot-20">
+                회원 탈퇴 시 회원 정보 및 활동 내역이 모두 삭제되며, 복원이 불가능하오니 유의하시기 바랍니다.
+            </div>
+        </div>
+        <div class="section pad-24 mtop-30">
+            <div class="desc mtop-20 mbot-20">
+                <a href="Main.html"><div class="button">메인화면으로 돌아가기</div></a>
+            </div>
+        </div>
+    </div>
+</form>
+
+<script src="js/jquery-3.7.1.min.js"></script>
+<script src="js/core.js"></script>
+<script>
+$(document).ready(function() {
+    Page.init(start);
+});
+
+function start(uid) {
+    // 현재 접속된 사용자 아이디를 불러옵니다.
+    $("#id").val(uid); // uid는 현재 접속된 사용자 아이디로 설정됩니다.
+}
+
+function withdraw() {
+    var id = $("#id").val().trim();
+    if (id == "") {
+        alert("아이디를 입력해 주세요.");
+        $("#id").focus();
+        return;
+    }
+    var ps = $("#ps").val().trim();
+    if (ps == "") {
+        alert("패스워드를 입력해 주세요.");
+        $("#ps").focus();
+        return;
+    }
+
+    var usrobj = {id: id, password: ps};
+    var params = {id: id, jsonstr: JSON.stringify(usrobj)};
+
+    var url = "jsp/withdraw.jsp";
+    AJAX.call(url, params, function(data) {
+        var code = data.trim();
+        if (code == "NF") { // NF = Not Found
+            alert("회원 정보를 찾을 수 없습니다."); 
+        }
+        else if(code == "ER") { // ER = Error
+            alert("회원탈퇴 처리 중 에러가 발생하였습니다.");
+        }
+        else {
+            alert("회원탈퇴가 완료되었습니다.");
+            window.location.href = "Login.html";
+        }
+    });
+}
+</script>
+</body>
+</html>

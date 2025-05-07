@@ -1,0 +1,192 @@
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=0">
+<meta charset="utf-8" />
+<link rel="stylesheet" href="css/core.css">
+<link rel="stylesheet" href="css/main.css">
+<title>회원 목록 • Pegasus</title>
+<style>
+
+.pad-4 { padding: 0 4px; }
+.pad-8 { padding: 0 8px; }
+
+.section.pad-8 {
+    margin-top: 10px; /* 메뉴바와 아이디 사이의 간격 조정 */
+}
+
+textarea {
+	float: left;
+	width: 100%;
+	height: 100px;
+	padding: 16px; 
+	box-sizing: border-box;
+	font-size: 1.0em;
+	font-family: 'Malgun Gothic', 'Arial';
+	border: 1px solid #ddd;
+	border-radius: 4px;
+	outline: none;
+}
+
+input[type=file] {
+	padding: 0px;
+	border: none;
+	outline: none;
+	font-size: 0.95em;
+}
+
+.desc {
+	float: left;
+	width: 100%;
+	margin-bottom: 5px;
+	font-size: 0.95em;
+	color: #888;
+}
+
+.image {
+    width: 150px;             /* 크기 조정 */
+    height: 150px;            /* 크기 조정 */
+    background-size: cover;
+    background-position: center;
+    margin-top: 10px;
+    margin-bottom: 10px;
+    border-radius: 50%;       /* 원형 설정 */
+    overflow: hidden;         /* 넘치는 부분 숨김 */
+}
+
+
+</style>
+</head>
+<body>
+	<div class="page-hdr">Pegasus</div>
+	<div class="page-body">
+		<div class="page-mnu">
+			<div class="menu" onclick="goHome()">홈</div>
+			<div class="menu" onclick="logout()">로그아웃</div>
+			<div class="menu" onclick="withdraw()">회원탈퇴</div>
+		</div>
+		<div class="section pad-24 mtop-20 mbot-20">
+			<div class="image" image="jsonobj.image"></div>
+			<div class="section pad-8 mtop-20 mbot-20">
+				[접속한 아이디] <span id="id"></span>
+			</div>
+			<input id="name" type="text" class="mtop-10 mbot-10" placeholder="이름">
+			<textarea id="desc" placeholder="간단한 소개글을 작성해주세요."></textarea>
+			<div class="section pad-4 mtop-30">
+				<div class="desc mtop-10 mbot-10">아래에서 이미지를 선택해주세요. (heic 계열은 불가합니다.)</div>
+				<input type="file" id="image">
+			</div>
+		</div>
+			<input type="submit" class="mtop-30" value="수정하기" onclick="update();">
+	<div class="page-footer">Copyright: Pegasus, 2024</div>
+	</div>
+</body>
+</html>
+
+<script src="js/jquery-3.7.1.min.js"></script>
+<script src="js/core.js"></script>
+<script>
+$(document).ready(function() {
+	Page.init(start);
+});
+
+
+//이미지 파일 선택 시 미리보기를 설정하는 코드
+document.getElementById('image').addEventListener('change', function() {
+    var file = this.files[0];
+    if (file) {
+        var reader = new FileReader();
+        reader.onload = function(e) {
+            document.querySelector('.image').style.backgroundImage = 'url(' + e.target.result + ')';
+        };
+        reader.readAsDataURL(file);
+    }
+});
+
+var userObj = null;
+function start(uid) {
+	var params = {id: uid};
+	AJAX.call("jsp/userGet.jsp", params, function(data) {
+		userObj = JSON.parse(data.trim());
+		setPage(userObj);
+	});
+}
+
+function setPage(uobj) {
+	if (uobj == null) return;
+	
+	$("#id").html(uobj.id);
+	$("#name").val(uobj.name);
+	$("#desc").val(uobj.desc);
+	
+	  // userObj에 이미지가 있는 경우, 초기 이미지를 설정합니다.
+	 let imgUrl = uobj.images && uobj.images.length > 0 
+     ? "/MySNS2/images/profile/" + uobj.images[0] 
+     : "/MySNS2/images/profile/default.jpg";
+
+	document.querySelector('.image').style.backgroundImage = 'url("' + imgUrl + '")';
+	}
+
+function update() {
+	var name = $("#name").val().trim();
+	if (name == "") {
+		alert("이름을 입력해 주세요.");
+		$("#name").focus();
+		return;
+	} 
+	var desc = $("#desc").val().trim();
+	var imgobj = $("#image")[0].files[0];
+	var jsonobj = userObj;
+	if (name != "") jsonobj.name = name;
+	if (desc != "") jsonobj.desc = desc;
+	if (imgobj != null) {
+		jsonobj.images = [imgobj.name]
+	}
+	jsonobj.ts = getTime();
+	
+	var params = new FormData();
+	params.append("id", jsonobj.id);
+	params.append("jsonstr", JSON.stringify(jsonobj));
+	if (imgobj != null) {
+		params.append("image", imgobj);
+	}
+	
+	var url = "jsp/userUpdate.jsp";
+	AJAX.call(url, params, function(data) {
+		var code = data.trim();
+		if(code == "ER") {			//ER: Error
+			alert("업데이트 중 오류가 발생했습니다.");
+		}
+		else {
+			alert("사용자 정보 업데이트가 완료되었습니다.");
+			history.back();
+		}
+	}, true);
+}
+
+function getTime() {
+	var date = new Date();
+	var year = date.getFullYear();
+	var month = ("0" + (1 + date.getMonth())).slice(-2);
+	var day =  ("0" + date.getDate()).slice(-2);
+	var hour =  ("0" + date.getHours()).slice(-2);
+	var min =  ("0" + date.getMinutes()).slice(-2);
+	var sec =  ("0" + date.getSeconds()).slice(-2);
+	
+	return year + "-" + month + "-" + day + "-" + hour + ":" + min + ":" + sec;
+}
+
+function goHome() {
+	window.location.href = "Main.html";
+}
+
+function logout() {
+	AJAX.call("jsp/logout.jsp", null, function(data) {
+		alert("로그아웃을 완료하였습니다.");
+		window.location.href = "Login.html";
+	});
+}
+
+function withdraw() {
+	window.location.href = "Withdraw.html";
+}
+</script> 

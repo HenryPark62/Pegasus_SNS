@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=0">
+  <meta charset="utf-8" />
+  <link rel="stylesheet" href="css/core.css">
+  <title>회원가입 • PEGASUS</title>
+  <style>
+    /* 비디오 배경 스타일 */
+    .bg-video {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      z-index: -1; /* 배경 뒤로 배치 */
+    }
+
+    .bg-video__content {
+      width: 100%;
+      height: 100%;
+      object-fit: cover; /* 화면을 꽉 채우도록 설정 */
+    }
+
+    /* 회원가입 입력 필드와 버튼이 배경보다 위에 표시되도록 설정 */
+    .page-body {
+      position: relative;
+      z-index: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      color: white;
+      padding: 20px;
+      box-sizing: border-box; /* padding 포함 */
+    }
+    
+    .page-title {
+      font-size: 3.0em; /* 제목 글자 크기 조정 */
+      font-weight: bold;
+      color: white;
+      margin-bottom: 40px; /* 제목과 로그인 창 사이 간격 */
+      text-align: center;
+    }
+
+    /* 입력란 및 버튼 스타일 */
+    .section {
+      background: rgba(0, 0, 0, 0.5); /* 불투명 배경으로 수정 */
+      border-radius: 10px;
+      padding: 20px;
+      width: 90%; /* 화면 크기에 따라 자동 조정 */
+      max-width: 400px; /* 최대 너비 설정 */
+      text-align: center;
+      margin-bottom: 20px; /* 섹션 간격 추가 */
+    }
+
+    input[type="text"], input[type="password"], .button {
+      width: 100%;
+      padding: 10px;
+      margin: 5px 0;
+      border-radius: 5px;
+      border: none;
+      outline: none;
+    }
+
+    input[type="submit"] {
+      background-color: rgba(255, 255, 255, 0.8); /* 투명한 흰색 배경 */
+      color: #362100;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    .button {
+      background-color: rgba(0, 0, 0, 0.3); /* 투명한 배경 */
+      color: #fff;
+      padding: 10px;
+      font-weight: bold;
+      cursor: pointer;
+      border: none; /* 테두리 없애기 */
+      outline: none; /* 아웃라인 없애기 */
+    }
+
+    .button:hover {
+      background-color: rgba(0, 0, 0, 0.5); /* 호버 시 조금 더 진한 배경 */
+    }
+
+    .desc {
+      color: #ccc;
+      font-size: 0.9em;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- 회원가입 화면 -->
+  <div class="page-body">
+  
+  <!-- 배경 비디오 추가 -->
+  <div class="bg-video">
+    <video autoplay muted loop class="bg-video__content" autoplay loop muted>
+      <source src="../MySNS2/images/background.mp4" type="video/mp4">
+      <!-- 브라우저에서 지원하지 않을 경우의 대체 텍스트 -->
+      Your browser does not support the video tag.
+    </video>
+  </div>
+
+   	<div class="page-title">PEGASUS</div>
+  
+    <div class="section pad-24 mtop-30">
+      <input id="id" type="text" placeholder="아이디 (이메일주소)">
+      <input id="ps" type="password" class="mtop-10" placeholder="패스워드">
+      <input id="ps2" type="password" class="mtop-10" placeholder="패스워드 (확인)">
+      <input id="name" type="text" class="mtop-10" placeholder="이름 (닉네임)">
+      <input type="submit" class="mtop-20" value="회원가입하기" onclick="signup(); return false;">
+    </div>
+    <!--   
+    <div class="section pad-24 mtop-30">
+      <div class="desc mtop-20 mbot-20">
+        회원가입 시 Pegasus의 약관에 동의하신 것으로 간주됩니다.
+      </div>
+      <a href="#"><div class="button">약관보기</div></a>
+    </div>
+    -->
+    <div class="section pad-24 mtop-30">
+      <div class="desc mtop-20 mbot-20">
+        <a href="Login.html"><div class="button">로그인화면으로 돌아가기</div></a>
+      </div>
+    </div>
+  </div>
+ <!-- <div class="page-footer">Copyright: Pegasus, 2024</div> --> 
+
+  <script src="js/jquery-3.7.1.min.js"></script>
+  <script src="js/core.js"></script>
+  <script>
+    function signup() {
+      var id = $("#id").val().trim();
+      if (id == "") {
+        alert("아이디를 입력해 주세요.");
+        $("#id").focus();
+        return;
+      }
+
+      var ps = $("#ps").val().trim();
+      if (ps == "") {
+        alert("패스워드를 입력해 주세요.");
+        $("#ps").focus();
+        return;
+      }
+
+      var ps2 = $("#ps2").val().trim();
+      if (ps != ps2) {
+        alert("입력된 두 개의 패스워드가 일치하지 않습니다.");
+        $("#ps2").focus();
+        return;
+      }
+
+      var name = $("#name").val().trim();
+      if (name == "") {
+        alert("이름을 입력해 주세요.");
+        $("#name").focus();
+        return;
+      }
+
+      var usrobj = {id: id, password: ps, name: name, ts: getToday()};
+      var params = {id: id, jsonstr: JSON.stringify(usrobj)};
+
+      var url = "jsp/signup.jsp";
+      AJAX.call(url, params, function(data) {
+        var code = data.trim();
+        if(code == "EX") { // EX = Exist
+          alert("이미 가입한 회원입니다.");
+        }
+        else if(code == "ER") { // ER = Error
+          alert("회원가입 처리 중 에러가 발생하였습니다.");
+        }
+        else {
+          alert("회원가입이 완료되었습니다.");
+          window.location.href = "Main.html";
+        }
+      });
+    }
+
+    function getToday() {
+      var date = new Date();
+      var year = date.getFullYear();
+      var month = ("0" + (1 + date.getMonth())).slice(-2);
+      var day = ("0" + date.getDate()).slice(-2);
+      return year + "-" + month + "-" + day;
+    }
+  </script>
+</body>
+</html>
