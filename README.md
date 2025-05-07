@@ -1,4 +1,10 @@
 # Pegasus_SNS (1인 프로젝트)
 Pegasus는 Java 기반의 SNS입니다. 
 * Java (JSP Servlet, JDBC, DAO, SQL, Ajax, JSON)  활용 Web 기반 SNS 개발 및 Android Studio, Kotlin 활용 Web View App 개발
-![adaptive-icon](https://github.com/user-attachments/assets/a00ed20a-7104-482e-abca-a1d3ae122fb0)
+
+- 회원가입/탈퇴, 로그인/로그아웃, 게시글 작성/삭제/수정, 친구추가/삭제 기능, 내 프로필 기능 구현
+- 개발한 SNS Web 기반 서비스를 모바일(Android)환경에서 동작하는 Web View App 으로 개발
+- App 디자인은 생성형 AI (ChatGPT) 사용
+
+
+<imgsrc="https://github.com/user-attachments/assets/a00ed20a-7104-482e-abca-a1d3ae122fb0" width="400" height="400"\>
