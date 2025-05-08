@@ -1,6 +1,6 @@
 # Pegasus_SNS
 
-<img src=![Pegasus_mod](https://github.com/user-attachments/assets/d75c4beb-a84e-4ff0-9f67-8466f127904d)
+![Pegasus_mod](https://github.com/user-attachments/assets/d75c4beb-a84e-4ff0-9f67-8466f127904d)
 
 https://github.com/user-attachments/assets/7287fae7-c430-45f1-98b6-20ac5e8b7161 width="400" height="400">
 
