@@ -1,4 +1,4 @@
-# Pegasus_SNS
+# Pegasus: Java 기반 SNS
 
 ![Pegasus_mod](https://github.com/user-attachments/assets/d75c4beb-a84e-4ff0-9f67-8466f127904d)
 
